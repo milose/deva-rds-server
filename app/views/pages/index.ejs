@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <% include ../partials/header.ejs %>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <% include ../partials/nav.ejs %>
+
+        <div class="jumbotron text-center">
+            <div class="container">
+                <h1>RDS Server connections</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3><i class="fa fa-rocket fa-fw"></i> Connected sessions: <%= io.engine.clientsCount %></h3>
+                    <% if (io.engine.clientsCount > 0) { %>
+                        <ul>
+                            <% for (var prop in sockets) { %>
+                                <li class="session">
+                                    <h4 class="session-station"><i class="fa fa-play-circle fa-fw"></i> <%= sockets[prop].username %></h4>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-5"><i class="fa fa-plug fa-fw <%= (sockets[prop].connected) ? 'text-success' : 'text-danger' %>"></i> <%= prop %></div>
+                                        <div class="col-xs-12 col-sm-4"><i class="fa fa-globe fa-fw"></i> <%= sockets[prop].handshake.address.replace('::ffff:', '') %></div>
+                                        <div class="col-xs-12 col-sm-3"><i class="fa fa-clock-o fa-fw"></i> <%= df(sockets[prop].handshake.time, 'mmmm d HH:MM:ss') %></div>
+                                    </div>
+                                </li>
+                                <% } %>
+                        </ul>
+                        <% } else { %>
+                            Nema konekcija...
+                            <% } %>
+                </div>
+            </div>
+            <!-- row -->
+        </div>
+
+
+</body>
+
+</html>
