@@ -70,13 +70,15 @@ io.on('connection', function(socket) {
     notify(msg);
 
     socket.on('disconnect', function() {
-        var msg = 'Client disconnected: ' + socket.username;
+        var msg = 'Client disconnected: ' + socket.username + '. No more clients!';
 
         if (process.env.RDS_SILENT == 'false') {
             console.log(msg);
         }
 
-        notify(msg);
+        if (io.engine.clientsCount == 0) {
+            notify(msg);
+        }
 
     });
 });
