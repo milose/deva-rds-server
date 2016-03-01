@@ -67,7 +67,9 @@ io.on('connection', function(socket) {
         console.log(msg);
     }
 
-    notify(msg);
+    if (io.engine.clientsCount == 1) {
+        notify(msg);
+    }
 
     socket.on('disconnect', function() {
         var msg = 'Client disconnected: ' + socket.username + '. No more clients!';
@@ -76,7 +78,7 @@ io.on('connection', function(socket) {
             console.log(msg);
         }
 
-        if (io.engine.clientsCount == 0) {
+        if (io.engine.clientsCount < 1) {
             notify(msg);
         }
 
