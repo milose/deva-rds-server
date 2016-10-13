@@ -47,21 +47,22 @@ let loadRds = function(file) {
 }
 
 // Watcher
-let watch_path = __dirname + '/' + process.env.RDS_WATCH + '**/*.txt'
+let watch_path = __dirname + '/' + process.env.RDS_WATCH
+let watch_pattern = watch_path + '**/*.txt'
 
 if (process.env.RDS_SILENT == 'false') {
-    console.log('Watching', watch_path)
+    console.log('Watching', watch_pattern)
 }
 
-chokidar.watch(watch_path, {
+chokidar.watch(watch_pattern, {
     ignored: /[\/\\]\./,
     ignoreInitial: true,
 }).on('change', loadRds)
 
 // Read all channels on start
-fs.readdirSync(process.env.RDS_WATCH).forEach(function(dir) {
-    fs.readdirSync(process.env.RDS_WATCH + dir).forEach(function(file) {
-        loadRds(process.env.RDS_WATCH + dir + '/' + file)
+fs.readdirSync(watch_path).forEach(function(dir) {
+    fs.readdirSync(watch_path + dir).forEach(function(file) {
+        loadRds(watch_path + dir + '/' + file)
     })
 })
 
