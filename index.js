@@ -5,15 +5,15 @@
 require('dotenv').config({
     path: __dirname + '/.env'
 });
-var previous = {};
+let previous = {};
 const fs = require('fs');
 const path = require('path');
-var request = require('request');
-var express = require('express');
-var chokidar = require('chokidar');
-var S = require('string').extendPrototype();
-var server = require('http').Server(express());
-var io = require('socket.io')(server);
+let request = require('request');
+let express = require('express');
+let chokidar = require('chokidar');
+let S = require('string').extendPrototype();
+let server = require('http').Server(express());
+let io = require('socket.io')(server);
 
 // Start a web socket server
 server.listen(process.env.WS_PORT);
@@ -23,7 +23,7 @@ console.log('Web-socket server is running on port', process.env.WS_PORT);
 require('./app/index.js').start(express, process.env.PORT, io);
 
 // Watcher
-var watch_path = __dirname + '/' + process.env.RDS_WATCH + '**/*.txt';
+let watch_path = __dirname + '/' + process.env.RDS_WATCH + '**/*.txt';
 if (process.env.RDS_SILENT == 'false') {
     console.log('Watching', watch_path);
 }
@@ -31,11 +31,11 @@ chokidar.watch(watch_path, {
     ignored: /[\/\\]\./,
     ignoreInitial: true,
 }).on('change', file => {
-    var channel = path.dirname(file)
+    let channel = path.dirname(file)
         .split(process.env.RDS_WATCH)
         .pop();
 
-    var data = fs.readFileSync(file, 'utf8').trim();
+    let data = fs.readFileSync(file, 'utf8').trim();
 
     if (data.length > 0 && data != previous[channel]) {
         previous[channel] = data;
@@ -61,7 +61,7 @@ io.on('connection', function(socket) {
     if (previous[socket.username] != '') {
         io.emit(process.env.WS_KEY + '.' + socket.username, previous[socket.username])
     }
-    var msg = 'Client connected: ' + socket.username + ' / ' + socket.request.connection.remoteAddress;
+    let msg = 'Client connected: ' + socket.username + ' / ' + socket.request.connection.remoteAddress;
 
     if (process.env.RDS_SILENT == 'false') {
         console.log(msg);
@@ -72,7 +72,7 @@ io.on('connection', function(socket) {
     }
 
     socket.on('disconnect', function() {
-        var msg = 'Client disconnected: ' + socket.username + '. No more clients!';
+        let msg = 'Client disconnected: ' + socket.username + '. No more clients!';
 
         if (process.env.RDS_SILENT == 'false') {
             console.log(msg);
