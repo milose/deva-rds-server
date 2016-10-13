@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "forever -w --minUptime=1000 --spinSleepTime=1000 ./index.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "deva.co",
+  "license": "MIT",
   "dependencies": {
     "chokidar": "^1.4.2",
     "dateformat": "^1.0.12",
@@ -19,5 +19,9 @@
     "request": "^2.69.0",
     "socket.io": "^1.4.5",
     "string": "^3.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/milose/deva-rds-server.git"
   }
 }
