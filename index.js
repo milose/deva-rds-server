@@ -49,7 +49,7 @@ chokidar.watch(watch_path, {
 });
 
 // Middleware
-io.use(function(socket, next) {
+io.use((socket, next) => {
     socket.username = socket.request._query['username'];
     next();
 });
