@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "forever start ./forever.json -w",
+    "prod": "forever -w --minUptime=1000 --spinSleepTime=1000 start ./forever.json",
     "dev": "forever -w --minUptime=1000 --spinSleepTime=1000 ./index.js"
   },
   "author": "deva.co",
