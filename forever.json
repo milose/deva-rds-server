@@ -6,6 +6,7 @@
     "script": "index.js",
     "sourceDir": "/var/www/nodes/rds-server/",
     "workingDir": "/var/www/nodes/rds-server/",
+    "watchDirectory": "/var/www/nodes/rds-server/",
     "minUptime": "1000",
     "spinSleepTime": "1000"
   }
