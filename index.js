@@ -124,7 +124,6 @@ io.on('connection', (socket) => {
 
 // Slack Notifier
 function notify(text) {
-    console.log('SLACK NOTIFY', text)
     if (process.env.SLACK_URL == '') return
 
     request.post(process.env.SLACK_URL, {
