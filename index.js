@@ -62,7 +62,9 @@ chokidar.watch(watch_pattern, {
 // Read all channels on start
 fs.readdirSync(watch_path).forEach(function(dir) {
     fs.readdirSync(watch_path + dir).forEach(function(file) {
-        loadRds(watch_path + dir + '/' + file)
+        if (path.extname(file) == '.txt') {
+            loadRds(watch_path + dir + '/' + file)
+        }
     })
 })
 
