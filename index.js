@@ -96,7 +96,6 @@ io.on('connection', (socket) => {
             timeout: null,
         }
     }
-
     if (connections[socket.username].shouldNotify == true) {
         notify(msg)
     }
@@ -124,15 +123,23 @@ io.on('connection', (socket) => {
 
 // Slack Notifier
 function notify(text) {
-    if (process.env.SLACK_URL == '') return
+    if (process.env.SLACK_URL == '') return;
 
-    request.post(process.env.SLACK_URL, {
-        form: {
-            payload: JSON.stringify({
-                'username': 'rds.deva.co',
-                'icon_emoji': ':cloud:',
-                'text': text,
-            })
+    try {
+        request.post(process.env.SLACK_URL, {
+            form: {
+                payload: JSON.stringify({
+                    'username': 'rds.deva.co',
+                    'icon_emoji': ':cloud:',
+                    'text': text,
+                })
+            }
+        });
+    } catch (ex) {
+        var msg = 'Slack error: ' + ex;
+
+        if (process.env.RDS_SILENT == 'false') {
+            console.log(msg);
         }
-    })
+    }
 }
