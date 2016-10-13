@@ -13,7 +13,6 @@ exports.start = function(express, port, io) {
     app.set('view engine', 'ejs');
 
     var sessions = getSessions(io);
-    console.log('Sessions', sessions)
 
     app.get('/', function(request, response) {
         var data = {
