@@ -25,7 +25,8 @@ console.log('Web-socket server is running on port', process.env.WS_PORT)
 // Start a front-end server
 require('./app/index.js').start(express, process.env.PORT, io)
 
-notify("Server started. http://deva.co:3338")
+// Notify slack on start
+notify("Server started: http://deva.co:3338")
 
 // RDS Loader
 let loadRds = function(file) {
