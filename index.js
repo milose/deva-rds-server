@@ -5,7 +5,6 @@
 require('dotenv').config({
     path: __dirname + '/.env'
 })
-let previous = {}
 const fs = require('fs')
 const path = require('path')
 let request = require('request')
@@ -15,6 +14,10 @@ let S = require('string').extendPrototype()
 let server = require('http').Server(express())
 let io = require('socket.io')(server)
 
+// States
+let previous = []
+let connections = []
+
 // Start a web socket server
 server.listen(process.env.WS_PORT)
 console.log('Web-socket server is running on port', process.env.WS_PORT)
@@ -22,15 +25,8 @@ console.log('Web-socket server is running on port', process.env.WS_PORT)
 // Start a front-end server
 require('./app/index.js').start(express, process.env.PORT, io)
 
-// Watcher
-let watch_path = __dirname + '/' + process.env.RDS_WATCH + '**/*.txt'
-if (process.env.RDS_SILENT == 'false') {
-    console.log('Watching', watch_path)
-}
-chokidar.watch(watch_path, {
-    ignored: /[\/\\]\./,
-    ignoreInitial: true,
-}).on('change', file => {
+// RDS Loader
+let loadRds = function(file) {
     let channel = path.dirname(file)
         .split(process.env.RDS_WATCH)
         .pop()
@@ -46,6 +42,25 @@ chokidar.watch(watch_path, {
             console.log('Channel:', channel, '| Data:', data)
         }
     }
+}
+
+// Watcher
+let watch_path = __dirname + '/' + process.env.RDS_WATCH + '**/*.txt'
+
+if (process.env.RDS_SILENT == 'false') {
+    console.log('Watching', watch_path)
+}
+
+chokidar.watch(watch_path, {
+    ignored: /[\/\\]\./,
+    ignoreInitial: true,
+}).on('change', loadRds)
+
+// Read all channels on start
+fs.readdirSync(process.env.RDS_WATCH).forEach(function(dir) {
+    fs.readdirSync(process.env.RDS_WATCH + dir).forEach(function(file) {
+        loadRds(process.env.RDS_WATCH + dir + '/' + file)
+    })
 })
 
 // Middleware
@@ -58,34 +73,56 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
     if (socket.username == '') return
 
-    if (previous[socket.username] != '') {
-        io.emit(process.env.WS_KEY + '.' + socket.username, previous[socket.username])
-    }
     let msg = 'Client connected: ' + socket.username + ' / ' + socket.request.connection.remoteAddress
 
     if (process.env.RDS_SILENT == 'false') {
         console.log(msg)
     }
 
-    if (io.engine.clientsCount == 1) {
+    // Emmit the last message for the reconnected client
+    if (previous[socket.username] != '') {
+        io.emit(process.env.WS_KEY + '.' + socket.username, previous[socket.username])
+    }
+
+    // Reduce Slack spam
+    if (typeof connections[socket.username] != 'undefined') {
+        clearTimeout(connections[socket.username].timeout)
+    }
+    else {
+        connections[socket.username] = {
+            shouldNotify: true,
+            timeout: null,
+        }
+    }
+
+    if (connections[socket.username].shouldNotify == true) {
         notify(msg)
     }
 
     socket.on('disconnect', () => {
-        let msg = 'Client disconnected: ' + socket.username + '. No more clients!'
+        let msg = 'Client disconnected: ' + socket.username + '!'
 
         if (process.env.RDS_SILENT == 'false') {
             console.log(msg)
         }
 
-        if (io.engine.clientsCount < 1) {
-            notify(msg)
+        /*
+            Create a timeout to reduce spam on Slack
+         */
+        connections[socket.username] = {
+            shouldNotify: false,
+            timeout: setTimeout(function() {
+                notify(msg)
+                connections[socket.username].shouldNotify = true
+            }, 15000)
         }
 
     })
 })
 
+// Slack Notifier
 function notify(text) {
+    console.log('SLACK NOTIFY', text)
     if (process.env.SLACK_URL == '') return
 
     request.post(process.env.SLACK_URL, {
