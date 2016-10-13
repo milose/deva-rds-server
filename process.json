@@ -1,0 +1,11 @@
+{
+    "apps": [{
+        "name": "rds-server",
+        "script": "./index.js",
+        "watch": true,
+        "ignore_watch" : ["node_modules", "incoming"],
+        "env": {
+            "NODE_ENV": "development",
+        }
+    }]
+}
