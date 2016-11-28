@@ -8,9 +8,9 @@
 
     <% include ../partials/header.ejs %>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
@@ -35,16 +35,28 @@
                                 <li class="session">
                                     <h4 class="session-station"><i class="fa fa-play-circle fa-fw"></i> <%= sockets[prop].username %></h4>
                                     <div class="row">
-                                        <div class="col-xs-12 col-sm-5"><i class="fa fa-plug fa-fw <%= (sockets[prop].connected) ? 'text-success' : 'text-danger' %>"></i> <%= prop %></div>
-                                        <div class="col-xs-12 col-sm-4"><i class="fa fa-globe fa-fw"></i> <%= sockets[prop].handshake.address.replace('::ffff:', '') %></div>
-                                        <div class="col-xs-12 col-sm-3"><i class="fa fa-clock-o fa-fw"></i> <%= df(sockets[prop].handshake.time, 'mmmm d HH:MM:ss') %></div>
+                                        <div class="col-xs-12 col-sm-5"><i class="fa fa-plug fa-fw <%= (sockets[prop].connected) ? 'text-success' : 'text-danger' %>"></i>
+                                            <%= prop %>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-4"><i class="fa fa-globe fa-fw"></i>
+                                            <%= sockets[prop].handshake.address.replace('::ffff:', '') %>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-3"><i class="fa fa-clock-o fa-fw"></i>
+                                            <%= df(sockets[prop].handshake.time, 'mmmm d HH:MM:ss') %>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <% if (previous[sockets[prop].username] != '') { %>
+                                                <i class="fa fa-list fa-fw text-muted"></i>
+                                                <span class="text-muted"><%= previous[sockets[prop].username] %></span>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 </li>
                                 <% } %>
                         </ul>
                         <% } else { %>
                             Nema konekcija...
-                            <% } %>
+                        <% } %>
                 </div>
             </div>
             <!-- row -->

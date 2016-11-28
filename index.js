@@ -23,7 +23,7 @@ server.listen(process.env.WS_PORT)
 console.log('Web-socket server is running on port', process.env.WS_PORT)
 
 // Start a front-end server
-require('./app/index.js').start(express, process.env.PORT, io)
+require('./app/index.js').start(express, process.env.PORT, io, previous)
 
 // Notify slack on start
 notify("Server started: http://deva.co:3338")
@@ -100,6 +100,7 @@ io.on('connection', (socket) => {
             timeout: null,
         }
     }
+    
     if (connections[socket.username].shouldNotify == true) {
         notify(msg)
     }
