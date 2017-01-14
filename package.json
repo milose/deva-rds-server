@@ -23,5 +23,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/milose/deva-rds-server.git"
+  },
+  "devDependencies": {
+    "standard": "^8.6.0"
   }
 }
