@@ -28,8 +28,16 @@ require('./app/index.js').start(express, process.env.PORT, io, previous)
 // Notify slack on start
 notify('Server started: http://deva.co:3338')
 
+let isValidFile = function (file) {
+  return path.extname(file) === '.txt'
+}
+
 // RDS Loader
 let loadRds = function (file) {
+  if (!isValidFile(file)) {
+    return
+  }
+
   let channel = path.dirname(file)
         .split(process.env.RDS_WATCH)
         .pop()
@@ -62,9 +70,7 @@ chokidar.watch(watchPath, {
 // Read all channels on start
 fs.readdirSync(watchPath).forEach(function (dir) {
   fs.readdirSync(watchPath + dir)
-    .filter(function (file) {
-      return path.extname(file) === '.txt'
-    })
+    .filter(isValidFile)
     .forEach(function (file) {
       loadRds(path.join(watchPath, dir, file))
     })
