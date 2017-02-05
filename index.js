@@ -14,6 +14,8 @@ let chokidar = require('chokidar')
 let server = require('http').Server(express())
 let io = require('socket.io')(server)
 
+let watchPath = path.join(__dirname, process.env.RDS_WATCH)
+
 // States
 let previous = []
 let connections = []
@@ -56,16 +58,14 @@ let loadRds = function (file) {
 }
 
 // Watcher
-let watchPath = path.join(__dirname, process.env.RDS_WATCH)
-
-if (process.env.RDS_SILENT === 'false') {
-  console.log('Watching', watchPath)
-}
-
 chokidar.watch(watchPath, {
   ignored: /[\\]\./,
   ignoreInitial: true
 }).on('change', loadRds)
+
+if (process.env.RDS_SILENT === 'false') {
+  console.log('Watching', watchPath)
+}
 
 // Read all channels on start
 fs.readdirSync(watchPath).forEach(function (dir) {
