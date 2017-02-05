@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "forever -w --minUptime=1000 --spinSleepTime=1000 ./index.js"
+    "test": "standard",
+    "dev": "node index.js"
   },
   "author": "deva.co",
   "license": "MIT",
