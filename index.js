@@ -49,13 +49,12 @@ let loadRds = function (file) {
 
 // Watcher
 let watchPath = path.join(__dirname, process.env.RDS_WATCH)
-let watchPattern = watchPath + process.env.RDS_PATTERN
 
 if (process.env.RDS_SILENT === 'false') {
-  console.log('Watching', watchPattern)
+  console.log('Watching', watchPath)
 }
 
-chokidar.watch(watchPattern, {
+chokidar.watch(watchPath, {
   ignored: /[\\]\./,
   ignoreInitial: true
 }).on('change', loadRds)
