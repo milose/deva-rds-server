@@ -60,7 +60,10 @@ let loadRds = function (file) {
 // Watcher
 chokidar.watch(watchPath, {
   ignored: /[\\]\./,
-  ignoreInitial: true
+  depth: 1,
+  awaitWriteFinish: true,
+  ignoreInitial: false,
+  followSymlinks: true
 }).on('change', loadRds)
 
 if (process.env.RDS_SILENT === 'false') {

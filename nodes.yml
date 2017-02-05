@@ -1,0 +1,9 @@
+apps:
+   - name: rds-server
+     script: nodes/rds-server/index.js
+     watch: true
+     ignore_watch:
+        - node_modules
+        - incoming
+     env:
+        NODE_ENV: production
