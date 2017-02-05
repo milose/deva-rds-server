@@ -26,5 +26,6 @@
   },
   "devDependencies": {
     "standard": "^8.6.0"
-  }
+  },
+  "ignore_watch": ["node_modules", "incoming"]
 }
