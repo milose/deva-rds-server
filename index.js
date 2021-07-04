@@ -1,23 +1,19 @@
 #!/usr/bin/env node
-
 'use strict'
+
+require('dotenv').config()
 
 const fs = require('fs')
 const path = require('path')
+const request = require('request')
+const chokidar = require('chokidar')
+const server = require("http").createServer();
+const io = require("socket.io")(server);
 
-require('dotenv').config({
-  path: path.join(__dirname, '.env')
-})
-let request = require('request')
-let express = require('express')
-let chokidar = require('chokidar')
-let server = require('http').Server(express())
-let io = require('socket.io')(server)
-
-let watchPath = path.join(__dirname, process.env.RDS_WATCH)
+const watchPath = path.join(__dirname, process.env.RDS_WATCH)
 
 // States
-let previous = []
+let lastMessage = []
 let connections = []
 
 // Start a web socket server
@@ -25,19 +21,15 @@ server.listen(process.env.WS_PORT)
 console.log('Web-socket server is running on port', process.env.WS_PORT)
 
 // Start a front-end server
-require('./app/index.js').start(express, process.env.PORT, io, previous)
+// require('./app/index.js').start(express, process.env.PORT, io, lastMessage)
 
 // Notify slack on start
-notify('Server started: http://deva.co:3338')
-
-let isValidFile = function (file) {
-  return path.extname(file) === '.txt'
-}
+// notify('Server started: http://deva.co:3338')
 
 // RDS Loader
 let loadRds = function (file) {
-  if (!isValidFile(file)) {
-    return
+  if (path.extname(file) !== '.txt') {
+    return;
   }
 
   let channel = path.dirname(file)
@@ -46,12 +38,12 @@ let loadRds = function (file) {
 
   let data = fs.readFileSync(file, 'utf8').trim()
 
-  if (data.length > 0 && data !== previous[channel]) {
-    previous[channel] = data
+  if (data.length > 0 && data !== lastMessage[channel]) {
+    lastMessage[channel] = data
 
     io.emit(process.env.WS_KEY + '.' + channel, data)
 
-    if (process.env.RDS_SILENT === 'false') {
+    if (process.env.NODE_ENV !== 'production') {
       console.log('Channel:', channel, '| Data:', data)
     }
   }
@@ -66,17 +58,15 @@ chokidar.watch(watchPath, {
   followSymlinks: true
 }).on('change', loadRds)
 
-if (process.env.RDS_SILENT === 'false') {
-  console.log('Watching', watchPath)
-}
+console.log('Watching', watchPath)
 
 // Read all channels on start
 fs.readdirSync(watchPath).forEach(function (dir) {
   fs.readdirSync(watchPath + dir)
-    .filter(isValidFile)
+    .filter(file => path.extname(file) === '.txt')
     .forEach(function (file) {
-      loadRds(path.join(watchPath, dir, file))
-    })
+      loadRds(path.join(watchPath, dir, file));
+    });
 })
 
 // Middleware
@@ -91,16 +81,16 @@ io.on('connection', (socket) => {
 
   let msg = 'Client connected: ' + socket.username + ' / ' + socket.request.connection.remoteAddress
 
-  if (process.env.RDS_SILENT === 'false') {
+  if (process.env.NODE_ENV !== 'production') {
     console.log(msg)
   }
 
-    // Emmit the last message for the reconnected client
-  if (previous[socket.username] !== '') {
-    io.emit(process.env.WS_KEY + '.' + socket.username, previous[socket.username])
+  // Emmit the last message for the reconnected client
+  if (lastMessage[socket.username]) {
+    io.emit(process.env.WS_KEY + '.' + socket.username, lastMessage[socket.username])
   }
 
-    // Reduce Slack spam
+  // Reduce Slack spam
   if (typeof connections[socket.username] !== 'undefined') {
     clearTimeout(connections[socket.username].timeout)
   } else {
@@ -117,13 +107,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     let msg = 'Client disconnected: ' + socket.username + '!'
 
-    if (process.env.RDS_SILENT === 'false') {
+    if (process.env.NODE_ENV !== 'production') {
       console.log(msg)
     }
 
-        /*
-            Create a timeout to reduce spam on Slack
-         */
     connections[socket.username] = {
       shouldNotify: false,
       timeout: setTimeout(function () {
@@ -151,7 +138,7 @@ function notify (text) {
   } catch (ex) {
     var msg = 'Slack error: ' + ex
 
-    if (process.env.RDS_SILENT === 'false') {
+    if (process.env.NODE_ENV !== 'production') {
       console.log(msg)
     }
   }

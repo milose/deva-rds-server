@@ -4,13 +4,12 @@ const path = require('path')
 
 exports.start = function (express, port, io, previous) {
   var app = express()
-  var df = require('dateformat')
 
   app.set('port', (port || 5000))
 
   app.use(express.static(path.join(__dirname, 'public')))
 
-    // views is directory for all template files
+  // views is directory for all template files
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
 
@@ -18,11 +17,8 @@ exports.start = function (express, port, io, previous) {
     var data = {
       io: io,
       sockets: io.sockets.sockets,
-      df: df,
       previous
     }
-
-        // console.log(require('util').inspect(io.engine.clients, {depth:null}))
 
     response.render('pages/index', data)
   })
