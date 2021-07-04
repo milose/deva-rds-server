@@ -62,11 +62,13 @@ console.log('Watching', watchPath)
 
 // Read all channels on start
 fs.readdirSync(watchPath).forEach(function (dir) {
-  fs.readdirSync(watchPath + dir)
-    .filter(file => path.extname(file) === '.txt')
+  if (fs.lstatSync(path.join(watchPath, dir)).isFile()) return;
+
+  fs.readdirSync(path.join(watchPath, dir))
+    .filter((file) => path.extname(file) === ".txt")
     .forEach(function (file) {
-      loadRds(path.join(watchPath, dir, file));
-    });
+      loadRds(path.join(watchPath, dir, file))
+    })
 })
 
 // Middleware
