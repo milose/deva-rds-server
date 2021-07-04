@@ -62,10 +62,10 @@ console.log('Watching', watchPath)
 
 // Read all channels on start
 fs.readdirSync(watchPath).forEach(function (dir) {
-  if (fs.lstatSync(path.join(watchPath, dir)).isFile()) return;
+  if (fs.lstatSync(path.join(watchPath, dir)).isFile()) return
 
   fs.readdirSync(path.join(watchPath, dir))
-    .filter((file) => path.extname(file) === ".txt")
+    .filter((file) => file === process.env.FILE_NAME)
     .forEach(function (file) {
       loadRds(path.join(watchPath, dir, file))
     })
