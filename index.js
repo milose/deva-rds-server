@@ -65,7 +65,7 @@ fs.readdirSync(watchPath).forEach(function (dir) {
   if (fs.lstatSync(path.join(watchPath, dir)).isFile()) return
 
   fs.readdirSync(path.join(watchPath, dir))
-    .filter((file) => file === process.env.FILE_NAME)
+    .filter((file) => file === process.env.RDS_FILE)
     .forEach(function (file) {
       loadRds(path.join(watchPath, dir, file))
     })
