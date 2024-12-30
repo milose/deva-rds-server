@@ -3,3 +3,4 @@ vendor
 .env
 log.json
 ip.txt
+public/*.png
